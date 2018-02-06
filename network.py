@@ -186,13 +186,14 @@ class ResNet_segmentation(object):
   Original ResNet-50 ('resnet_v1_50.ckpt')
   """
 
-  def __init__(self, inputs, num_classes, phase, encoder_name):
+  def __init__(self, inputs, map_inputs, num_classes, phase, encoder_name):
     if encoder_name not in ['res101', 'res50']:
       print('encoder_name ERROR!')
       print("Please input: res101, res50")
       sys.exit(-1)
     self.encoder_name = encoder_name
     self.inputs = inputs
+    self.map_inputs = map_inputs
     self.num_classes = num_classes
     self.channel_axis = 3
     self.phase = phase  # train (True) or test (False), for BN layers in the decoder
@@ -240,7 +241,11 @@ class ResNet_segmentation(object):
 
   # blocks
   def _start_block(self, name):
+    #ToDo: for the start block modify the input to get RGB + mask input
     outputs = self._conv2d(self.inputs, 7, 64, 2, name=name)
+    outputs_m = self._conv2d(self.map_inputs, 7, 64, 2, name=name+"_map")
+    outputs = outputs + outputs_m
+
     outputs = self._batch_norm(outputs, name=name, is_training=False, activation_fn=tf.nn.relu)
     outputs = self._max_pool2d(outputs, 3, 2, name='pool1')
     return outputs

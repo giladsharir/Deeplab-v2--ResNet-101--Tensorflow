@@ -175,6 +175,8 @@ class ImageReader(object):
                                                shuffle=input_size is not None)  # not shuffling if it is val
     self.image, self.label = read_images_from_disk(self.queue, self.input_size, random_scale, random_mirror,
                                                    ignore_label, img_mean)
+    #perform augmentations on label mask
+
 
   def dequeue(self, num_elements):
     '''Pack images and labels into a batch.
